@@ -1,148 +1,345 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>GreenTrace 碳訊通</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GreenTrace</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    .nav-active { color: #16a34a; background-color: #f0fdf4; }
-  </style>
 </head>
-<body class="bg-gray-50 min-h-screen">
-  <!-- Header -->
-  <div class="bg-white shadow-sm p-4 flex justify-between items-center max-w-md mx-auto">
-    <div class="flex items-center">
-      <span class="text-green-600 text-xl font-bold">🌱 GreenTrace</span>
-    </div>
-    <div class="text-yellow-500 font-bold" id="totalPoints">1250 分</div>
-  </div>
-
-  <!-- Main Content -->
-  <div id="content" class="max-w-md mx-auto p-4 pb-24">
-    <!-- Home 頁面會由 JS 插入 -->
-  </div>
-
-  <!-- Footer Navigation -->
-  <div class="fixed bottom-0 left-0 right-0 bg-white border-t">
-    <div class="max-w-md mx-auto flex justify-around text-sm">
-      <button onclick="navigate('home')" class="nav-btn nav-active py-2 flex flex-col items-center">
-        🏠<span>首頁</span>
-      </button>
-      <button onclick="navigate('tasks')" class="nav-btn py-2 flex flex-col items-center">
-        ✅<span>任務</span>
-      </button>
-      <button onclick="navigate('profile')" class="nav-btn py-2 flex flex-col items-center">
-        👤<span>我的</span>
-      </button>
-    </div>
-  </div>
-
+<body class="min-h-screen bg-gray-50">
   <!-- 任務完成提示 -->
-  <div id="taskComplete" class="fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg hidden">
-    🎉 任務完成！獲得 <span id="pointsGained"></span> 分
+  <div id="task-complete-tip" class="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 hidden">
+    <div class="flex items-center">
+      ✅
+      <span class="ml-2">任务完成！获得 <span id="task-points">0</span> 积分</span>
+    </div>
   </div>
 
-  <!-- JS邏輯 -->
+  <!-- 頂部 Header -->
+  <div class="bg-white shadow-sm">
+    <div class="max-w-md mx-auto px-4 py-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center">
+          🌿
+          <h1 class="text-xl font-bold text-gray-800 ml-2">GreenTrace</h1>
+        </div>
+        <div class="flex items-center text-sm text-gray-600">
+          ⭐
+          <span id="user-totalPoints" class="ml-1">1250 积分</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 主內容 -->
+  <div class="max-w-md mx-auto px-4 py-6 pb-20" id="home-content">
+    <!-- 用戶統計卡片 -->
+    <div class="bg-gradient-to-r from-green-400 to-blue-500 rounded-lg p-6 text-white mb-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-2xl font-bold">欢迎回来！</h2>
+          <p class="text-green-100">继续你的环保之旅</p>
+        </div>
+        <div class="text-right">
+          <div id="user-totalPoints2" class="text-3xl font-bold">1250</div>
+          <div class="text-sm text-green-100">总积分</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 统计网格 -->
+    <div class="grid grid-cols-2 gap-4 mb-6">
+      <div class="bg-white rounded-lg p-4 shadow-sm border">
+        <div class="flex items-center">
+          🍃
+          <div class="ml-3">
+            <div id="user-carbon" class="text-2xl font-bold text-gray-800">2.45</div>
+            <div class="text-sm text-gray-600">千克碳减排</div>
+          </div>
+        </div>
+      </div>
+      <div class="bg-white rounded-lg p-4 shadow-sm border">
+        <div class="flex items-center">
+          🏆
+          <div class="ml-3">
+            <div id="user-rank" class="text-2xl font-bold text-gray-800">#3</div>
+            <div class="text-sm text-gray-600">当前排名</div>
+          </div>
+        </div>
+      </div>
+      <div class="bg-white rounded-lg p-4 shadow-sm border">
+        <div class="flex items-center">
+          🎯
+          <div class="ml-3">
+            <div id="user-tasks" class="text-2xl font-bold text-gray-800">18</div>
+            <div class="text-sm text-gray-600">完成任务</div>
+          </div>
+        </div>
+      </div>
+      <div class="bg-white rounded-lg p-4 shadow-sm border">
+        <div class="flex items-center">
+          ⚡
+          <div class="ml-3">
+            <div id="user-streak" class="text-2xl font-bold text-gray-800">7</div>
+            <div class="text-sm text-gray-600">连续天数</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 今日任务 -->
+    <div class="bg-white rounded-lg p-4 shadow-sm border">
+      <h3 class="text-lg font-semibold mb-3 flex items-center">✅<span class="ml-2">今日任务</span></h3>
+      <div id="task-list" class="space-y-2"></div>
+    </div>
+  </div>
+
   <script>
-    let userStats = { points: 1250, carbon: 2.45, tasks: 18 };
+    const userStats = {
+      totalPoints: 1250,
+      totalCarbonSaved: 2.45,
+      tasksCompleted: 18,
+      rank: 3,
+      streak: 7
+    };
+
     const tasks = [
-      { id: 1, title: "使用可重複水杯", points: 10, carbon: 0.1 },
-      { id: 2, title: "步行上班", points: 25, carbon: 0.5 },
-      { id: 3, title: "關閉電器", points: 15, carbon: 0.2 }
+      { id: 1, title: "使用可重复使用的水杯", points: 10, carbonSaved: 0.1 },
+      { id: 2, title: "步行或骑行上班", points: 25, carbonSaved: 0.5 },
+      { id: 3, title: "关闭不必要的电器", points: 15, carbonSaved: 0.2 }
     ];
-    let completed = new Set();
 
-    function navigate(page) {
-      document.querySelectorAll(".nav-btn").forEach(btn => btn.classList.remove("nav-active"));
-      event.target.closest("button").classList.add("nav-active");
+    const completedTasks = new Set();
 
-      const content = document.getElementById("content");
-      if (page === 'home') {
-        content.innerHTML = `
-          <div class="bg-white p-4 rounded-lg shadow-sm mb-4">
-            <h2 class="text-xl font-bold mb-2">歡迎回來！</h2>
-            <p class="text-sm text-gray-600">持續你的綠色生活</p>
-          </div>
-          <div class="grid grid-cols-2 gap-4 mb-4">
-            <div class="bg-white p-4 rounded shadow">
-              <div class="text-sm text-gray-500">總減排</div>
-              <div class="text-xl font-bold text-blue-500">${userStats.carbon.toFixed(2)} kg</div>
-            </div>
-            <div class="bg-white p-4 rounded shadow">
-              <div class="text-sm text-gray-500">總積分</div>
-              <div class="text-xl font-bold text-yellow-500">${userStats.points}</div>
-            </div>
-          </div>
-          <div class="bg-white p-4 rounded shadow">
-            <h3 class="font-semibold mb-2">📋 今日任務</h3>
-            ${tasks.map(task => `
-              <div class="flex justify-between items-center my-2">
-                <div>
-                  <div>${task.title}</div>
-                  <div class="text-xs text-gray-500">+${task.points}分 / -${task.carbon}kg</div>
-                </div>
-                <button onclick="completeTask(${task.id})"
-                  class="px-3 py-1 rounded text-white bg-green-500 hover:bg-green-600"
-                  ${completed.has(task.id) ? 'disabled class="bg-gray-300 cursor-not-allowed"' : ''}>
-                  ${completed.has(task.id) ? '完成✅' : '完成'}
-                </button>
-              </div>`).join('')}
-          </div>`;
-      }
-
-      else if (page === 'tasks') {
-        content.innerHTML = `
-          <h2 class="text-xl font-bold mb-4">任務清單</h2>
-          ${tasks.map(task => `
-            <div class="bg-white p-4 mb-3 rounded shadow-sm flex justify-between items-center">
-              <div>
-                <div class="font-medium">${task.title}</div>
-                <div class="text-xs text-gray-500">+${task.points}分 / -${task.carbon}kg</div>
-              </div>
-              <button onclick="completeTask(${task.id})"
-                class="px-4 py-1 rounded text-white ${completed.has(task.id) ? 'bg-gray-300' : 'bg-green-500 hover:bg-green-600'}"
-                ${completed.has(task.id) ? 'disabled' : ''}>
-                ${completed.has(task.id) ? '完成✅' : '完成'}
-              </button>
-            </div>
-          `).join('')}
-        `;
-      }
-
-      else if (page === 'profile') {
-        content.innerHTML = `
-          <div class="bg-white p-4 rounded shadow-sm">
-            <h2 class="text-xl font-bold mb-4">👤 我的資料</h2>
-            <p>總積分：<span class="font-bold">${userStats.points}</span></p>
-            <p>碳減排：<span class="font-bold">${userStats.carbon.toFixed(2)} kg</span></p>
-            <p>完成任務：<span class="font-bold">${userStats.tasks}</span></p>
-          </div>
-        `;
-      }
+    function updateStatsDisplay() {
+      document.getElementById("user-totalPoints").textContent = userStats.totalPoints + " 积分";
+      document.getElementById("user-totalPoints2").textContent = userStats.totalPoints;
+      document.getElementById("user-carbon").textContent = userStats.totalCarbonSaved.toFixed(2);
+      document.getElementById("user-rank").textContent = "#" + userStats.rank;
+      document.getElementById("user-tasks").textContent = userStats.tasksCompleted;
+      document.getElementById("user-streak").textContent = userStats.streak;
     }
 
-    function completeTask(id) {
-      if (completed.has(id)) return;
-      const task = tasks.find(t => t.id === id);
-      completed.add(id);
-      userStats.points += task.points;
-      userStats.carbon += task.carbon;
-      userStats.tasks += 1;
+    function showTaskCompleteTip(task) {
+      document.getElementById("task-points").textContent = task.points;
+      const tip = document.getElementById("task-complete-tip");
+      tip.classList.remove("hidden");
+      setTimeout(() => tip.classList.add("hidden"), 3000);
+    }
 
-      document.getElementById("totalPoints").textContent = userStats.points + " 分";
-      document.getElementById("pointsGained").textContent = task.points;
-      document.getElementById("taskComplete").classList.remove("hidden");
+    function completeTask(taskId) {
+      const task = tasks.find(t => t.id === taskId);
+      if (completedTasks.has(task.id)) return;
+      completedTasks.add(task.id);
+      userStats.totalPoints += task.points;
+      userStats.totalCarbonSaved += task.carbonSaved;
+      userStats.tasksCompleted += 1;
+      updateStatsDisplay();
+      showTaskCompleteTip(task);
+      renderTasks();
+    }
 
-      setTimeout(() => {
-        document.getElementById("taskComplete").classList.add("hidden");
-      }, 2000);
-
-      navigate('home');
+    function renderTasks() {
+      const list = document.getElementById("task-list");
+      list.innerHTML = '';
+      tasks.forEach(task => {
+        const taskDiv = document.createElement("div");
+        taskDiv.className = "flex items-center justify-between p-3 bg-gray-50 rounded-lg";
+        taskDiv.innerHTML = `
+          <div class="flex-1">
+            <div class="font-medium">${task.title}</div>
+            <div class="text-sm text-gray-600">+${task.points} 积分 | -${task.carbonSaved}kg 碳排放</div>
+          </div>
+          <button
+            onclick="completeTask(${task.id})"
+            ${completedTasks.has(task.id) ? 'disabled' : ''}
+            class="px-4 py-2 rounded-lg font-medium ${
+              completedTasks.has(task.id)
+                ? 'bg-green-100 text-green-700 cursor-not-allowed'
+                : 'bg-green-500 text-white hover:bg-green-600'
+            }"
+          >
+            ${completedTasks.has(task.id) ? '已完成' : '完成'}
+          </button>
+        `;
+        list.appendChild(taskDiv);
+      });
     }
 
     // 初始化
-    navigate('home');
+renderPage('home');
+<script>
+  function renderPage(page) {
+    const container = document.getElementById('home-content');
+    if (!container) return;
+
+    if (page === 'home') {
+      container.innerHTML = homeTemplate();
+      updateStatsDisplay();
+      renderTasks();
+    }
+
+    if (page === 'tasks') {
+      container.innerHTML = tasksTemplate();
+      renderAllTasks();
+    }
+
+    if (page === 'leaderboard') {
+  container.innerHTML = leaderboardTemplate();
+  renderLeaderboard();
+}
+
+    if (page === 'rewards') {
+  container.innerHTML = rewardsTemplate();
+  renderRewards();
+}
+
+    // 排行榜、獎勵、個人頁將在下一階段補上
+  }
+
+  function homeTemplate() {
+    return `<!--（原本 home-content 裡的整個 HTML，可保持不變）-->`;
+  }
+
+  function tasksTemplate() {
+    return `
+      <h2 class="text-2xl font-bold text-gray-800 mb-4">环保任务</h2>
+      <div id="all-tasks-list" class="grid gap-4"></div>
+    `;
+  }
+
+  function renderAllTasks() {
+    const list = document.getElementById("all-tasks-list");
+    list.innerHTML = '';
+    tasks.forEach(task => {
+      const div = document.createElement("div");
+      div.className = "bg-white rounded-lg p-4 shadow-sm border";
+      div.innerHTML = `
+        <div class="flex items-center justify-between">
+          <div class="flex-1">
+            <h3 class="font-semibold text-lg">${task.title}</h3>
+            <div class="flex items-center mt-2 text-sm text-gray-600">
+              ⭐ <span class="ml-1 mr-4">${task.points} 积分</span>
+              🍃 <span class="ml-1">减少 ${task.carbonSaved}kg 碳排放</span>
+            </div>
+          </div>
+          <button onclick="completeTask(${task.id})"
+            ${completedTasks.has(task.id) ? 'disabled' : ''}
+            class="px-6 py-2 rounded-lg font-medium ${
+              completedTasks.has(task.id)
+                ? 'bg-green-100 text-green-700 cursor-not-allowed'
+                : 'bg-green-500 text-white hover:bg-green-600'
+            }">
+            ${completedTasks.has(task.id) ? '✓ 已完成' : '完成任务'}
+          </button>
+        </div>
+      `;
+      list.appendChild(div);
+    });
+  }
+const leaderboard = [
+  { rank: 1, name: "环保达人", points: 1580, carbonSaved: 3.2 },
+  { rank: 2, name: "绿色生活", points: 1420, carbonSaved: 2.9 },
+  { rank: 3, name: "你", points: userStats.totalPoints, carbonSaved: userStats.totalCarbonSaved },
+  { rank: 4, name: "低碳先锋", points: 1100, carbonSaved: 2.1 },
+  { rank: 5, name: "节能专家", points: 980, carbonSaved: 1.8 }
+];
+
+function leaderboardTemplate() {
+  return `
+    <h2 class="text-2xl font-bold text-gray-800 mb-4">排行榜</h2>
+    <div id="leaderboard-list" class="bg-white rounded-lg shadow-sm border divide-y"></div>
+  `;
+}
+
+function renderLeaderboard() {
+  const list = document.getElementById("leaderboard-list");
+  list.innerHTML = '';
+  leaderboard.forEach(user => {
+    const item = document.createElement("div");
+    item.className = `flex items-center p-4 ${user.name === "你" ? 'bg-green-50' : ''}`;
+    item.innerHTML = `
+      <div class="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-r from-green-400 to-blue-500 text-white font-bold mr-4">
+        ${user.rank}
+      </div>
+      <div class="flex-1">
+        <div class="font-semibold">${user.name}</div>
+        <div class="text-sm text-gray-600">${user.carbonSaved}kg 碳减排</div>
+      </div>
+      <div class="text-right">
+        <div class="font-bold text-lg">${user.points}</div>
+        <div class="text-sm text-gray-600">积分</div>
+      </div>
+    `;
+    list.appendChild(item);
+  });
+}
+const rewards = [
+  { id: 1, name: "环保购物袋", points: 200, stock: 15 },
+  { id: 2, name: "竹制牙刷", points: 150, stock: 8 },
+  { id: 3, name: "太阳能充电宝", points: 800, stock: 3 },
+  { id: 4, name: "有机种子套装", points: 300, stock: 12 }
+];
+
+function rewardsTemplate() {
+  return `
+    <h2 class="text-2xl font-bold text-gray-800 mb-4">奖励商店</h2>
+    <div id="rewards-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+  `;
+}
+
+function renderRewards() {
+  const list = document.getElementById("rewards-list");
+  list.innerHTML = '';
+  rewards.forEach(reward => {
+    const item = document.createElement("div");
+    item.className = "bg-white rounded-lg p-4 shadow-sm border";
+    item.innerHTML = `
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="font-semibold text-lg">${reward.name}</h3>
+        <div class="text-sm text-gray-600">库存: ${reward.stock}</div>
+      </div>
+      <div class="flex items-center justify-between">
+        <div class="flex items-center">
+          ⭐<span class="font-medium ml-1">${reward.points} 积分</span>
+        </div>
+        <button
+          ${userStats.totalPoints < reward.points ? 'disabled' : ''}
+          class="px-4 py-2 rounded-lg font-medium ${
+            userStats.totalPoints >= reward.points
+              ? 'bg-blue-500 text-white hover:bg-blue-600'
+              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+          }"
+        >
+          兑换
+        </button>
+      </div>
+    `;
+    list.appendChild(item);
+  });
+}
+
+    
   </script>
-</body>
-</html>
+<!-- 底部導航 -->
+<div class="fixed bottom-0 left-0 right-0 bg-white border-t">
+  <div class="max-w-md mx-auto px-4">
+    <div class="flex justify-around py-2 text-sm">
+      <button onclick="renderPage('home')" class="flex flex-col items-center text-gray-600 hover:text-green-600">
+        🏠<span class="text-xs mt-1">首页</span>
+      </button>
+      <button onclick="renderPage('tasks')" class="flex flex-col items-center text-gray-600 hover:text-green-600">
+        ✅<span class="text-xs mt-1">任务</span>
+      </button>
+      <button onclick="renderPage('leaderboard')" class="flex flex-col items-center text-gray-600 hover:text-green-600">
+  🏆<span class="text-xs mt-1">排行榜</span>
+</button>
+     <button onclick="renderPage('rewards')" class="flex flex-col items-center text-gray-600 hover:text-green-600">
+  🎁<span class="text-xs mt-1">奖励</span>
+</button>
+      <button disabled class="flex flex-col items-center text-gray-400">
+        👤<span class="text-xs mt-1">我的</span>
+      </button>
+    </div>
+  </div>
+</div>
