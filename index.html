@@ -1,478 +1,56 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-Hant">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GreenTrace - 环保追踪应用</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @keyframes bounce {
-            0%, 20%, 53%, 80%, 100% { transform: translate3d(0,0,0); }
-            40%, 43% { transform: translate3d(0,-30px,0); }
-            70% { transform: translate3d(0,-15px,0); }
-            90% { transform: translate3d(0,-4px,0); }
-        }
-        .animate-bounce {
-            animation: bounce 1s infinite;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GreenTrace 碳訊通</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+    }
+  </style>
 </head>
 <body class="min-h-screen bg-gray-50">
-    <div id="app">
-        <!-- 任务完成提示 -->
-        <div id="taskCompleteToast" class="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-bounce hidden">
-            <div class="flex items-center">
-                <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-                <span id="taskCompleteText">任务完成！</span>
-            </div>
-        </div>
-
-        <!-- 头部 -->
-        <div class="bg-white shadow-sm">
-            <div class="max-w-md mx-auto px-4 py-4">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center">
-                        <svg class="h-8 w-8 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3l14 9-14 9V3z"></path>
-                        </svg>
-                        <h1 class="text-xl font-bold text-gray-800">GreenTrace</h1>
-                    </div>
-                    <div class="flex items-center text-sm text-gray-600">
-                        <svg class="h-4 w-4 mr-1 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
-                        </svg>
-                        <span id="headerPoints">1250 积分</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 主要内容 -->
-        <div class="max-w-md mx-auto px-4 py-6 pb-20">
-            <div id="content">
-                <!-- 首页内容 -->
-                <div id="homePage" class="space-y-6">
-                    <!-- 用户统计卡片 -->
-                    <div class="bg-gradient-to-r from-green-400 to-blue-500 rounded-lg p-6 text-white">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <h2 class="text-2xl font-bold">欢迎回来！</h2>
-                                <p class="text-green-100">继续你的环保之旅</p>
-                            </div>
-                            <div class="text-right">
-                                <div class="text-3xl font-bold" id="totalPoints">1250</div>
-                                <div class="text-sm text-green-100">总积分</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 统计网格 -->
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="bg-white rounded-lg p-4 shadow-sm border">
-                            <div class="flex items-center">
-                                <svg class="h-8 w-8 text-green-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3l14 9-14 9V3z"></path>
-                                </svg>
-                                <div>
-                                    <div class="text-2xl font-bold text-gray-800" id="carbonSaved">2.45</div>
-                                    <div class="text-sm text-gray-600">千克碳减排</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="bg-white rounded-lg p-4 shadow-sm border">
-                            <div class="flex items-center">
-                                <svg class="h-8 w-8 text-yellow-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
-                                <div>
-                                    <div class="text-2xl font-bold text-gray-800" id="currentRank">#3</div>
-                                    <div class="text-sm text-gray-600">当前排名</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="bg-white rounded-lg p-4 shadow-sm border">
-                            <div class="flex items-center">
-                                <svg class="h-8 w-8 text-blue-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4"></path>
-                                </svg>
-                                <div>
-                                    <div class="text-2xl font-bold text-gray-800" id="tasksCompleted">18</div>
-                                    <div class="text-sm text-gray-600">完成任务</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="bg-white rounded-lg p-4 shadow-sm border">
-                            <div class="flex items-center">
-                                <svg class="h-8 w-8 text-orange-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                                </svg>
-                                <div>
-                                    <div class="text-2xl font-bold text-gray-800" id="streak">7</div>
-                                    <div class="text-sm text-gray-600">连续天数</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 今日任务 -->
-                    <div class="bg-white rounded-lg p-4 shadow-sm border">
-                        <h3 class="text-lg font-semibold mb-3 flex items-center">
-                            <svg class="h-5 w-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                            今日任务
-                        </h3>
-                        <div class="space-y-2" id="todayTasks">
-                            <!-- 今日任务将由JavaScript动态生成 -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 任务页面 -->
-                <div id="tasksPage" class="space-y-4 hidden">
-                    <h2 class="text-2xl font-bold text-gray-800">环保任务</h2>
-                    <div class="grid gap-4" id="allTasks">
-                        <!-- 所有任务将由JavaScript动态生成 -->
-                    </div>
-                </div>
-
-                <!-- 排行榜页面 -->
-                <div id="leaderboardPage" class="space-y-4 hidden">
-                    <h2 class="text-2xl font-bold text-gray-800">排行榜</h2>
-                    <div class="bg-white rounded-lg shadow-sm border" id="leaderboardList">
-                        <!-- 排行榜将由JavaScript动态生成 -->
-                    </div>
-                </div>
-
-                <!-- 奖励页面 -->
-                <div id="rewardsPage" class="space-y-4 hidden">
-                    <h2 class="text-2xl font-bold text-gray-800">奖励商店</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="rewardsList">
-                        <!-- 奖励将由JavaScript动态生成 -->
-                    </div>
-                </div>
-
-                <!-- 个人资料页面 -->
-                <div id="profilePage" class="space-y-6 hidden">
-                    <h2 class="text-2xl font-bold text-gray-800">个人资料</h2>
-                    
-                    <div class="bg-white rounded-lg p-6 shadow-sm border">
-                        <div class="flex items-center mb-6">
-                            <div class="w-20 h-20 bg-gradient-to-r from-green-400 to-blue-500 rounded-full flex items-center justify-center text-white text-2xl font-bold mr-4">
-                                U
-                            </div>
-                            <div>
-                                <h3 class="text-xl font-semibold">环保用户</h3>
-                                <p class="text-gray-600">加入时间: 2024年1月</p>
-                            </div>
-                        </div>
-                        
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="text-center p-4 bg-gray-50 rounded-lg">
-                                <div class="text-2xl font-bold text-green-600" id="profilePoints">1250</div>
-                                <div class="text-sm text-gray-600">总积分</div>
-                            </div>
-                            <div class="text-center p-4 bg-gray-50 rounded-lg">
-                                <div class="text-2xl font-bold text-blue-600" id="profileCarbon">2.45</div>
-                                <div class="text-sm text-gray-600">千克碳减排</div>
-                            </div>
-                            <div class="text-center p-4 bg-gray-50 rounded-lg">
-                                <div class="text-2xl font-bold text-purple-600" id="profileTasks">18</div>
-                                <div class="text-sm text-gray-600">完成任务</div>
-                            </div>
-                            <div class="text-center p-4 bg-gray-50 rounded-lg">
-                                <div class="text-2xl font-bold text-orange-600" id="profileRank">#3</div>
-                                <div class="text-sm text-gray-600">当前排名</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 底部导航 -->
-        <div class="fixed bottom-0 left-0 right-0 bg-white border-t">
-            <div class="max-w-md mx-auto px-4">
-                <div class="flex justify-around py-2">
-                    <button class="nav-btn flex flex-col items-center py-2 px-3 rounded-lg text-green-600 bg-green-50" data-page="home">
-                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m0 0V11a1 1 0 011-1h2a1 1 0 011 1v10m0 0h3a1 1 0 001-1V10M9 21h6"></path>
-                        </svg>
-                        <span class="text-xs mt-1">首页</span>
-                    </button>
-                    <button class="nav-btn flex flex-col items-center py-2 px-3 rounded-lg text-gray-600 hover:text-green-600" data-page="tasks">
-                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                        <span class="text-xs mt-1">任务</span>
-                    </button>
-                    <button class="nav-btn flex flex-col items-center py-2 px-3 rounded-lg text-gray-600 hover:text-green-600" data-page="leaderboard">
-                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                        <span class="text-xs mt-1">排行榜</span>
-                    </button>
-                    <button class="nav-btn flex flex-col items-center py-2 px-3 rounded-lg text-gray-600 hover:text-green-600" data-page="rewards">
-                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"></path>
-                        </svg>
-                        <span class="text-xs mt-1">奖励</span>
-                    </button>
-                    <button class="nav-btn flex flex-col items-center py-2 px-3 rounded-lg text-gray-600 hover:text-green-600" data-page="profile">
-                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                        </svg>
-                        <span class="text-xs mt-1">我的</span>
-                    </button>
-                </div>
-            </div>
-        </div>
+  <div class="max-w-md mx-auto p-4 text-center">
+    <div class="flex items-center justify-center mb-6">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-green-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 2C8 6 6 9 6 12c0 3.3 2.7 6 6 6s6-2.7 6-6c0-3-2-6-6-10z"/>
+      </svg>
+      <h1 class="text-2xl font-bold text-gray-800 ml-2">GreenTrace 碳訊通</h1>
     </div>
 
-    <script>
-        // 应用状态
-        let currentPage = 'home';
-        let userStats = {
-            totalCarbonSaved: 2.45,
-            totalPoints: 1250,
-            tasksCompleted: 18,
-            rank: 3,
-            streak: 7
-        };
-        let completedTasks = new Set();
+    <p class="text-gray-600 mb-4">你的低碳生活任務記錄系統</p>
 
-        // 任务数据
-        const tasks = [
-            { id: 1, title: "使用可重复使用的水杯", points: 10, carbonSaved: 0.1 },
-            { id: 2, title: "步行或骑行上班", points: 25, carbonSaved: 0.5 },
-            { id: 3, title: "关闭不必要的电器", points: 15, carbonSaved: 0.2 },
-            { id: 4, title: "使用公共交通", points: 20, carbonSaved: 0.3 },
-            { id: 5, title: "回收塑料瓶", points: 12, carbonSaved: 0.15 },
-            { id: 6, title: "减少肉类消费", points: 30, carbonSaved: 0.8 }
-        ];
+    <div class="grid grid-cols-2 gap-4 mb-6">
+      <div class="bg-white p-4 rounded-lg shadow-sm">
+        <div class="text-sm text-gray-500">已完成任務</div>
+        <div class="text-2xl font-bold text-green-600">18</div>
+      </div>
+      <div class="bg-white p-4 rounded-lg shadow-sm">
+        <div class="text-sm text-gray-500">總減排碳</div>
+        <div class="text-2xl font-bold text-blue-500">2.45 kg</div>
+      </div>
+      <div class="bg-white p-4 rounded-lg shadow-sm">
+        <div class="text-sm text-gray-500">總積分</div>
+        <div class="text-2xl font-bold text-yellow-500">1250</div>
+      </div>
+      <div class="bg-white p-4 rounded-lg shadow-sm">
+        <div class="text-sm text-gray-500">連續天數</div>
+        <div class="text-2xl font-bold text-orange-500">7</div>
+      </div>
+    </div>
 
-        // 排行榜数据
-        const leaderboard = [
-            { rank: 1, name: "环保达人", points: 1580, carbonSaved: 3.2 },
-            { rank: 2, name: "绿色生活", points: 1420, carbonSaved: 2.9 },
-            { rank: 3, name: "你", points: 1250, carbonSaved: 2.45 },
-            { rank: 4, name: "低碳先锋", points: 1100, carbonSaved: 2.1 },
-            { rank: 5, name: "节能专家", points: 980, carbonSaved: 1.8 }
-        ];
+    <div class="bg-white p-4 rounded-lg shadow-md mb-6 text-left">
+      <h2 class="text-lg font-semibold mb-3">📋 今日任務</h2>
+      <ul class="space-y-3 text-sm text-gray-700">
+        <li>✅ 使用可重複使用的水杯（+10分 / -0.1kg碳）</li>
+        <li>✅ 步行或騎行上班（+25分 / -0.5kg碳）</li>
+        <li>⬜ 關閉不必要的電器（+15分 / -0.2kg碳）</li>
+      </ul>
+    </div>
 
-        // 奖励数据
-        const rewards = [
-            { id: 1, name: "环保购物袋", points: 200, stock: 15 },
-            { id: 2, name: "竹制牙刷", points: 150, stock: 8 },
-            { id: 3, name: "太阳能充电宝", points: 800, stock: 3 },
-            { id: 4, name: "有机种子套装", points: 300, stock: 12 }
-        ];
-
-        // 更新UI
-        function updateUI() {
-            document.getElementById('headerPoints').textContent = userStats.totalPoints + ' 积分';
-            document.getElementById('totalPoints').textContent = userStats.totalPoints;
-            document.getElementById('carbonSaved').textContent = userStats.totalCarbonSaved;
-            document.getElementById('currentRank').textContent = '#' + userStats.rank;
-            document.getElementById('tasksCompleted').textContent = userStats.tasksCompleted;
-            document.getElementById('streak').textContent = userStats.streak;
-            
-            // 更新个人资料页面
-            document.getElementById('profilePoints').textContent = userStats.totalPoints;
-            document.getElementById('profileCarbon').textContent = userStats.totalCarbonSaved;
-            document.getElementById('profileTasks').textContent = userStats.tasksCompleted;
-            document.getElementById('profileRank').textContent = '#' + userStats.rank;
-        }
-
-        // 完成任务
-        function completeTask(taskId) {
-            if (completedTasks.has(taskId)) return;
-            
-            const task = tasks.find(t => t.id === taskId);
-            if (!task) return;
-            
-            completedTasks.add(taskId);
-            userStats.totalPoints += task.points;
-            userStats.totalCarbonSaved += task.carbonSaved;
-            userStats.tasksCompleted += 1;
-            
-            // 显示完成提示
-            document.getElementById('taskCompleteText').textContent = `任务完成！获得 ${task.points} 积分`;
-            document.getElementById('taskCompleteToast').classList.remove('hidden');
-            
-            setTimeout(() => {
-                document.getElementById('taskCompleteToast').classList.add('hidden');
-            }, 3000);
-            
-            updateUI();
-            renderTasks();
-            renderTodayTasks();
-        }
-
-        // 渲染今日任务
-        function renderTodayTasks() {
-            const container = document.getElementById('todayTasks');
-            container.innerHTML = '';
-            
-            tasks.slice(0, 3).forEach(task => {
-                const isCompleted = completedTasks.has(task.id);
-                const taskElement = document.createElement('div');
-                taskElement.className = 'flex items-center justify-between p-3 bg-gray-50 rounded-lg';
-                taskElement.innerHTML = `
-                    <div class="flex-1">
-                        <div class="font-medium">${task.title}</div>
-                        <div class="text-sm text-gray-600">+${task.points} 积分 | -${task.carbonSaved}kg 碳排放</div>
-                    </div>
-                    <button 
-                        onclick="completeTask(${task.id})"
-                        ${isCompleted ? 'disabled' : ''}
-                        class="px-4 py-2 rounded-lg font-medium ${isCompleted ? 'bg-green-100 text-green-700 cursor-not-allowed' : 'bg-green-500 text-white hover:bg-green-600'}"
-                    >
-                        ${isCompleted ? '已完成' : '完成'}
-                    </button>
-                `;
-                container.appendChild(taskElement);
-            });
-        }
-
-        // 渲染所有任务
-        function renderTasks() {
-            const container = document.getElementById('allTasks');
-            container.innerHTML = '';
-            
-            tasks.forEach(task => {
-                const isCompleted = completedTasks.has(task.id);
-                const taskElement = document.createElement('div');
-                taskElement.className = 'bg-white rounded-lg p-4 shadow-sm border';
-                taskElement.innerHTML = `
-                    <div class="flex items-center justify-between">
-                        <div class="flex-1">
-                            <h3 class="font-semibold text-lg">${task.title}</h3>
-                            <div class="flex items-center mt-2 text-sm text-gray-600">
-                                <svg class="h-4 w-4 mr-1 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
-                                </svg>
-                                <span class="mr-4">${task.points} 积分</span>
-                                <svg class="h-4 w-4 mr-1 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3l14 9-14 9V3z"></path>
-                                </svg>
-                                <span>减少 ${task.carbonSaved}kg 碳排放</span>
-                            </div>
-                        </div>
-                        <button
-                            onclick="completeTask(${task.id})"
-                            ${isCompleted ? 'disabled' : ''}
-                            class="px-6 py-2 rounded-lg font-medium ${isCompleted ? 'bg-green-100 text-green-700 cursor-not-allowed' : 'bg-green-500 text-white hover:bg-green-600'}"
-                        >
-                            ${isCompleted ? '✓ 已完成' : '完成任务'}
-                        </button>
-                    </div>
-                `;
-                container.appendChild(taskElement);
-            });
-        }
-
-        // 渲染排行榜
-        function renderLeaderboard() {
-            const container = document.getElementById('leaderboardList');
-            container.innerHTML = '';
-            
-            leaderboard.forEach((user, index) => {
-                const userElement = document.createElement('div');
-                userElement.className = `flex items-center p-4 ${index !== leaderboard.length - 1 ? 'border-b' : ''} ${user.name === '你' ? 'bg-green-50' : ''}`;
-                userElement.innerHTML = `
-                    <div class="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-r from-green-400 to-blue-500 text-white font-bold mr-4">
-                        ${user.rank}
-                    </div>
-                    <div class="flex-1">
-                        <div class="font-semibold">${user.name}</div>
-                        <div class="text-sm text-gray-600">${user.carbonSaved}kg 碳减排</div>
-                    </div>
-                    <div class="text-right">
-                        <div class="font-bold text-lg">${user.points}</div>
-                        <div class="text-sm text-gray-600">积分</div>
-                    </div>
-                `;
-                container.appendChild(userElement);
-            });
-        }
-
-        // 渲染奖励
-        function renderRewards() {
-            const container = document.getElementById('rewardsList');
-            container.innerHTML = '';
-            
-            rewards.forEach(reward => {
-                const canAfford = userStats.totalPoints >= reward.points;
-                const rewardElement = document.createElement('div');
-                rewardElement.className = 'bg-white rounded-lg p-4 shadow-sm border';
-                rewardElement.innerHTML = `
-                    <div class="flex items-center justify-between mb-3">
-                        <h3 class="font-semibold text-lg">${reward.name}</h3>
-                        <div class="text-sm text-gray-600">库存: ${reward.stock}</div>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center">
-                            <svg class="h-4 w-4 text-yellow-500 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
-                            </svg>
-                            <span class="font-medium">${reward.points} 积分</span>
-                        </div>
-                        <button
-                            ${!canAfford ? 'disabled' : ''}
-                            class="px-4 py-2 rounded-lg font-medium ${canAfford ? 'bg-blue-500 text-white hover:bg-blue-600' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}"
-                        >
-                            兑换
-                        </button>
-                    </div>
-                `;
-                container.appendChild(rewardElement);
-            });
-        }
-
-        // 切换页面
-        function switchPage(page) {
-            // 隐藏所有页面
-            document.querySelectorAll('[id$="Page"]').forEach(el => {
-                el.classList.add('hidden');
-            });
-            
-            // 显示当前页面
-            document.getElementById(page + 'Page').classList.remove('hidden');
-            
-            // 更新导航按钮状态
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.remove('text-green-600', 'bg-green-50');
-                btn.classList.add('text-gray-600', 'hover:text-green-600');
-            });
-            
-            document.querySelector(`[data-page="${page}"]`).classList.add('text-green-600', 'bg-green-50');
-            document.querySelector(`[data-page="${page}"]`).classList.remove('text-gray-600', 'hover:text-green-600');
-            
-            currentPage = page;
-        }
-
-        // 初始化应用
-        function init() {
-            updateUI();
-            renderTodayTasks();
-            renderTasks();
-            renderLeaderboard();
-            renderRewards();
-            
-            // 绑定导航事件
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const page = e.currentTarget.getAttribute('data-page');
-                    switchPage(page);
-                });
-            });
-        }
-
-        // 页面加载完成后初始化
-        document.addEventListener('DOMContentLoaded', init);
-    </script>
+    <div class="text-sm text-gray-500 mb-2">© 2025 GreenTrace by Joey</div>
+  </div>
 </body>
 </html>
