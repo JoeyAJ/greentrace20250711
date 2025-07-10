@@ -1,0 +1,370 @@
+import React, { useState, useEffect } from 'react';
+import {
+  Leaf,
+  Trophy,
+  Target,
+  BarChart3,
+  Gift,
+  Users,
+  Calendar,
+  CheckCircle,
+  Star,
+  Award,
+  TrendingUp,
+  ShoppingCart,
+  FileText,
+  User,
+  Clock,
+  Zap
+} from 'lucide-react';
+
+const GreenTraceApp = () => {
+  const [currentPage, setCurrentPage] = useState('home');
+  const [userStats, setUserStats] = useState({
+    totalCarbonSaved: 2.45,
+    totalPoints: 1250,
+    tasksCompleted: 18,
+    rank: 3,
+    streak: 7
+  });
+  const [completedTasks, setCompletedTasks] = useState(new Set());
+  const [showTaskComplete, setShowTaskComplete] = useState(false);
+  const [lastCompletedTask, setLastCompletedTask] = useState(null);
+
+  // 模拟任务数据
+  const tasks = [
+    { id: 1, title: "使用可重复使用的水杯", points: 10, carbonSaved: 0.1 },
+    { id: 2, title: "步行或骑行上班", points: 25, carbonSaved: 0.5 },
+    { id: 3, title: "关闭不必要的电器", points: 15, carbonSaved: 0.2 },
+    { id: 4, title: "使用公共交通", points: 20, carbonSaved: 0.3 },
+    { id: 5, title: "回收塑料瓶", points: 12, carbonSaved: 0.15 },
+    { id: 6, title: "减少肉类消费", points: 30, carbonSaved: 0.8 }
+  ];
+
+  // 排行榜数据
+  const leaderboard = [
+    { rank: 1, name: "环保达人", points: 1580, carbonSaved: 3.2 },
+    { rank: 2, name: "绿色生活", points: 1420, carbonSaved: 2.9 },
+    { rank: 3, name: "你", points: userStats.totalPoints, carbonSaved: userStats.totalCarbonSaved },
+    { rank: 4, name: "低碳先锋", points: 1100, carbonSaved: 2.1 },
+    { rank: 5, name: "节能专家", points: 980, carbonSaved: 1.8 }
+  ];
+
+  // 奖励商店数据
+  const rewards = [
+    { id: 1, name: "环保购物袋", points: 200, stock: 15 },
+    { id: 2, name: "竹制牙刷", points: 150, stock: 8 },
+    { id: 3, name: "太阳能充电宝", points: 800, stock: 3 },
+    { id: 4, name: "有机种子套装", points: 300, stock: 12 }
+  ];
+
+  const completeTask = (task) => {
+    if (completedTasks.has(task.id)) return;
+    
+    const newCompletedTasks = new Set(completedTasks);
+    newCompletedTasks.add(task.id);
+    setCompletedTasks(newCompletedTasks);
+    
+    setUserStats(prev => ({
+      ...prev,
+      totalPoints: prev.totalPoints + task.points,
+      totalCarbonSaved: prev.totalCarbonSaved + task.carbonSaved,
+      tasksCompleted: prev.tasksCompleted + 1
+    }));
+    
+    setLastCompletedTask(task);
+    setShowTaskComplete(true);
+    setTimeout(() => setShowTaskComplete(false), 3000);
+  };
+
+  const renderHome = () => (
+    <div className="space-y-6">
+      {/* 用户统计卡片 */}
+      <div className="bg-gradient-to-r from-green-400 to-blue-500 rounded-lg p-6 text-white">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-bold">欢迎回来！</h2>
+            <p className="text-green-100">继续你的环保之旅</p>
+          </div>
+          <div className="text-right">
+            <div className="text-3xl font-bold">{userStats.totalPoints}</div>
+            <div className="text-sm text-green-100">总积分</div>
+          </div>
+        </div>
+      </div>
+
+      {/* 统计网格 */}
+      <div className="grid grid-cols-2 gap-4">
+        <div className="bg-white rounded-lg p-4 shadow-sm border">
+          <div className="flex items-center">
+            <Leaf className="h-8 w-8 text-green-500 mr-3" />
+            <div>
+              <div className="text-2xl font-bold text-gray-800">{userStats.totalCarbonSaved}</div>
+              <div className="text-sm text-gray-600">千克碳减排</div>
+            </div>
+          </div>
+        </div>
+        <div className="bg-white rounded-lg p-4 shadow-sm border">
+          <div className="flex items-center">
+            <Trophy className="h-8 w-8 text-yellow-500 mr-3" />
+            <div>
+              <div className="text-2xl font-bold text-gray-800">#{userStats.rank}</div>
+              <div className="text-sm text-gray-600">当前排名</div>
+            </div>
+          </div>
+        </div>
+        <div className="bg-white rounded-lg p-4 shadow-sm border">
+          <div className="flex items-center">
+            <Target className="h-8 w-8 text-blue-500 mr-3" />
+            <div>
+              <div className="text-2xl font-bold text-gray-800">{userStats.tasksCompleted}</div>
+              <div className="text-sm text-gray-600">完成任务</div>
+            </div>
+          </div>
+        </div>
+        <div className="bg-white rounded-lg p-4 shadow-sm border">
+          <div className="flex items-center">
+            <Zap className="h-8 w-8 text-orange-500 mr-3" />
+            <div>
+              <div className="text-2xl font-bold text-gray-800">{userStats.streak}</div>
+              <div className="text-sm text-gray-600">连续天数</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 今日任务 */}
+      <div className="bg-white rounded-lg p-4 shadow-sm border">
+        <h3 className="text-lg font-semibold mb-3 flex items-center">
+          <CheckCircle className="h-5 w-5 mr-2 text-green-500" />
+          今日任务
+        </h3>
+        <div className="space-y-2">
+          {tasks.slice(0, 3).map(task => (
+            <div key={task.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div className="flex-1">
+                <div className="font-medium">{task.title}</div>
+                <div className="text-sm text-gray-600">+{task.points} 积分 | -{task.carbonSaved}kg 碳排放</div>
+              </div>
+              <button
+                onClick={() => completeTask(task)}
+                disabled={completedTasks.has(task.id)}
+                className={`px-4 py-2 rounded-lg font-medium ${
+                  completedTasks.has(task.id)
+                    ? 'bg-green-100 text-green-700 cursor-not-allowed'
+                    : 'bg-green-500 text-white hover:bg-green-600'
+                }`}
+              >
+                {completedTasks.has(task.id) ? '已完成' : '完成'}
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderTasks = () => (
+    <div className="space-y-4">
+      <h2 className="text-2xl font-bold text-gray-800">环保任务</h2>
+      <div className="grid gap-4">
+        {tasks.map(task => (
+          <div key={task.id} className="bg-white rounded-lg p-4 shadow-sm border">
+            <div className="flex items-center justify-between">
+              <div className="flex-1">
+                <h3 className="font-semibold text-lg">{task.title}</h3>
+                <div className="flex items-center mt-2 text-sm text-gray-600">
+                  <Star className="h-4 w-4 mr-1 text-yellow-500" />
+                  <span className="mr-4">{task.points} 积分</span>
+                  <Leaf className="h-4 w-4 mr-1 text-green-500" />
+                  <span>减少 {task.carbonSaved}kg 碳排放</span>
+                </div>
+              </div>
+              <button
+                onClick={() => completeTask(task)}
+                disabled={completedTasks.has(task.id)}
+                className={`px-6 py-2 rounded-lg font-medium ${
+                  completedTasks.has(task.id)
+                    ? 'bg-green-100 text-green-700 cursor-not-allowed'
+                    : 'bg-green-500 text-white hover:bg-green-600'
+                }`}
+              >
+                {completedTasks.has(task.id) ? '✓ 已完成' : '完成任务'}
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  const renderLeaderboard = () => (
+    <div className="space-y-4">
+      <h2 className="text-2xl font-bold text-gray-800">排行榜</h2>
+      <div className="bg-white rounded-lg shadow-sm border">
+        {leaderboard.map((user, index) => (
+          <div key={index} className={`flex items-center p-4 ${index !== leaderboard.length - 1 ? 'border-b' : ''} ${user.name === '你' ? 'bg-green-50' : ''}`}>
+            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-r from-green-400 to-blue-500 text-white font-bold mr-4">
+              {user.rank}
+            </div>
+            <div className="flex-1">
+              <div className="font-semibold">{user.name}</div>
+              <div className="text-sm text-gray-600">{user.carbonSaved}kg 碳减排</div>
+            </div>
+            <div className="text-right">
+              <div className="font-bold text-lg">{user.points}</div>
+              <div className="text-sm text-gray-600">积分</div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  const renderRewards = () => (
+    <div className="space-y-4">
+      <h2 className="text-2xl font-bold text-gray-800">奖励商店</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {rewards.map(reward => (
+          <div key={reward.id} className="bg-white rounded-lg p-4 shadow-sm border">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-semibold text-lg">{reward.name}</h3>
+              <div className="text-sm text-gray-600">库存: {reward.stock}</div>
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <Star className="h-4 w-4 text-yellow-500 mr-1" />
+                <span className="font-medium">{reward.points} 积分</span>
+              </div>
+              <button
+                disabled={userStats.totalPoints < reward.points}
+                className={`px-4 py-2 rounded-lg font-medium ${
+                  userStats.totalPoints >= reward.points
+                    ? 'bg-blue-500 text-white hover:bg-blue-600'
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                }`}
+              >
+                兑换
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  const renderProfile = () => (
+    <div className="space-y-6">
+      <h2 className="text-2xl font-bold text-gray-800">个人资料</h2>
+      
+      <div className="bg-white rounded-lg p-6 shadow-sm border">
+        <div className="flex items-center mb-6">
+          <div className="w-20 h-20 bg-gradient-to-r from-green-400 to-blue-500 rounded-full flex items-center justify-center text-white text-2xl font-bold mr-4">
+            U
+          </div>
+          <div>
+            <h3 className="text-xl font-semibold">环保用户</h3>
+            <p className="text-gray-600">加入时间: 2024年1月</p>
+          </div>
+        </div>
+        
+        <div className="grid grid-cols-2 gap-4">
+          <div className="text-center p-4 bg-gray-50 rounded-lg">
+            <div className="text-2xl font-bold text-green-600">{userStats.totalPoints}</div>
+            <div className="text-sm text-gray-600">总积分</div>
+          </div>
+          <div className="text-center p-4 bg-gray-50 rounded-lg">
+            <div className="text-2xl font-bold text-blue-600">{userStats.totalCarbonSaved}</div>
+            <div className="text-sm text-gray-600">千克碳减排</div>
+          </div>
+          <div className="text-center p-4 bg-gray-50 rounded-lg">
+            <div className="text-2xl font-bold text-purple-600">{userStats.tasksCompleted}</div>
+            <div className="text-sm text-gray-600">完成任务</div>
+          </div>
+          <div className="text-center p-4 bg-gray-50 rounded-lg">
+            <div className="text-2xl font-bold text-orange-600">#{userStats.rank}</div>
+            <div className="text-sm text-gray-600">当前排名</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const navigation = [
+    { id: 'home', label: '首页', icon: <User className="h-5 w-5" /> },
+    { id: 'tasks', label: '任务', icon: <CheckCircle className="h-5 w-5" /> },
+    { id: 'leaderboard', label: '排行榜', icon: <Trophy className="h-5 w-5" /> },
+    { id: 'rewards', label: '奖励', icon: <Gift className="h-5 w-5" /> },
+    { id: 'profile', label: '我的', icon: <User className="h-5 w-5" /> }
+  ];
+
+  const renderContent = () => {
+    switch(currentPage) {
+      case 'home': return renderHome();
+      case 'tasks': return renderTasks();
+      case 'leaderboard': return renderLeaderboard();
+      case 'rewards': return renderRewards();
+      case 'profile': return renderProfile();
+      default: return renderHome();
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* 任务完成提示 */}
+      {showTaskComplete && (
+        <div className="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-bounce">
+          <div className="flex items-center">
+            <CheckCircle className="h-5 w-5 mr-2" />
+            <span>任务完成！获得 {lastCompletedTask?.points} 积分</span>
+          </div>
+        </div>
+      )}
+
+      {/* 头部 */}
+      <div className="bg-white shadow-sm">
+        <div className="max-w-md mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <Leaf className="h-8 w-8 text-green-500 mr-2" />
+              <h1 className="text-xl font-bold text-gray-800">GreenTrace</h1>
+            </div>
+            <div className="flex items-center text-sm text-gray-600">
+              <Star className="h-4 w-4 mr-1 text-yellow-500" />
+              <span>{userStats.totalPoints} 积分</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 主要内容 */}
+      <div className="max-w-md mx-auto px-4 py-6 pb-20">
+        {renderContent()}
+      </div>
+
+      {/* 底部导航 */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t">
+        <div className="max-w-md mx-auto px-4">
+          <div className="flex justify-around py-2">
+            {navigation.map(item => (
+              <button
+                key={item.id}
+                onClick={() => setCurrentPage(item.id)}
+                className={`flex flex-col items-center py-2 px-3 rounded-lg ${
+                  currentPage === item.id
+                    ? 'text-green-600 bg-green-50'
+                    : 'text-gray-600 hover:text-green-600'
+                }`}
+              >
+                {item.icon}
+                <span className="text-xs mt-1">{item.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default GreenTraceApp;
